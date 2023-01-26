@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shopkeeper/app_config.dart';
 import 'package:shopkeeper/pages/choose_mode_page.dart';
 import 'package:shopkeeper/pages/detail_promotion_page.dart';
+import 'package:shopkeeper/pages/recover_password_page.dart';
 import 'package:shopkeeper/pages/root_page.dart';
 import 'package:shopkeeper/pages/login_page.dart';
 import 'package:shopkeeper/pages/register_page.dart';
@@ -79,6 +80,7 @@ class ShopKeeperApp extends StatelessWidget {
         "/tabs": (BuildContext context) => TabBarPage(),
         "/detailPromotion": (BuildContext context) => DetailPromotionPage(),
         "/terms": (BuildContext context) => TermsAndConditionsPage(),
+        "/passRec":(BuildContext context) => RecoverPassword()
       },
     );
   }

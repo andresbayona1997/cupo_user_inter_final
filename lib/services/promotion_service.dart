@@ -74,6 +74,21 @@ class PromotionService {
     //     .then(_handleRequest);
   }
 
+  Future beforeRedeemPromotion(String redeemCode) async {
+    String shopkeeperId = await storage.read(key: 'id');
+    String token = await storage.read(key: 'token');
+    Map data = {
+      "redeem_code": redeemCode,
+      "shopkeeper_id": shopkeeperId,
+    };
+    final response = await dio.post('/before/redeem/promotions', options: DIO.Options(
+      headers: {'Authorization': 'Bearer '+token,'Content-type': 'application/json'},
+    ), data: data).onError((error, stackTrace) {
+      print(error);
+    });
+    return _handleRequest(response);
+  }
+
   Future getPromotion(String promotionCode) async {
     String token = await storage.read(key: 'token');
     final response = await dio.get('/get/promotions/$promotionCode', options: DIO.Options(
@@ -91,6 +106,8 @@ class PromotionService {
     // Uri uri = Uri.https(urlApp, url);
     // return await http.get(uri, headers: headers).then(_handleRequest);
   }
+
+
 
   Future acceptPromotion(String promotionCode) async {
     String token = await storage.read(key: 'token');

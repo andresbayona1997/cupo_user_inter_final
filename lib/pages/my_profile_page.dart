@@ -188,6 +188,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       borderRadius: BorderRadius.all(Radius.circular(8.0))),
                 ),
               ),
+            ),
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pushNamed('/passRec');
+              },
+              child: Text("Cambiar contraseña",
+                style: TextStyle(
+                    color: Color.fromRGBO(148, 3, 123, 1.0)
+                ),
+              ),
             )
           ],
         ),

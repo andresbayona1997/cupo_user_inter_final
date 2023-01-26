@@ -67,6 +67,28 @@ class UserService {
     //     .then(_handleRequest);
   }
 
+  Future getStatusStore() async {
+    String token = await storage.read(key: 'token');
+    final response = await dio.get('/status/shopkeepers', options: DIO.Options(
+        headers: {'Authorization': 'Bearer '+token, 'Content-type': 'application/json'}
+    ));
+    return _handleRequest(response);
+  }
+
+  Future changeStatusStore() async{
+    Map info = {
+      "status": "OPEN_SHOP",
+      "status_profile": "SHOPKEEPERS_ENABLED"
+    };
+
+    String token = await storage.read(key: 'token');
+    final response = await dio.put('/status/shopkeepers', options: DIO.Options(
+      headers: {'Content-type': 'application/json','Authorization': 'Bearer '+token},
+    ), data: info);
+
+    return _handleRequest(response);
+  }
+
   Future getUserById(String id) async {
     String token = await storage.read(key: 'token');
     final response = await dio.get('/users/$id', options: DIO.Options(
@@ -100,6 +122,18 @@ class UserService {
     // return await http
     //     .put(uri, headers: headers, body: jsonEncode(shopkeeper))
     //     .then(_handleRequest);
+  }
+
+  Future recoverPassword(String email) async{
+    Map user = {
+      "email": email
+    };
+    final response = await dio.post('/restore/password', options: DIO.Options(
+      headers: {'Content-type': 'application/json'},
+    ), data: user).onError((error, stackTrace) {
+      print(error);
+    });
+    return _handleRequest(response);
   }
 
   Future login(String username, String uuid) async {

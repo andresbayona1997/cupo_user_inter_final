@@ -120,6 +120,19 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.all(Radius.circular(8.0))),
                 ),
               ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pushNamed('/passRec');
+              },
+              child: Text("¿Olvidaste tu contraseña?",
+                style: TextStyle(
+                  color: Color.fromRGBO(148, 3, 123, 1.0)
+                ),
+              ),
             )
           ],
         ),

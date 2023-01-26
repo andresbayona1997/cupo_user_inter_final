@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shopkeeper/services/user_service.dart';
 import 'package:shopkeeper/utils/classes/date.dart';
 import 'package:shopkeeper/utils/widgets/dialog_progress.dart';
 import 'package:shopkeeper/utils/widgets/nav_bar.dart';
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   StatusService _statusService = new StatusService();
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   ChartService _chartService = new ChartService();
+  UserService _userService = new UserService();
   bool _validated = false;
   bool _isLoading = true;
   DateTime selectedDate = DateTime.now();
@@ -53,6 +55,48 @@ class _HomePageState extends State<HomePage> {
           _validated = val;
           _isLoading = false;
         });
+    });
+    _userService.getStatusStore().then((value){
+      if(value["data"]["status"]=="CLOSED_SHOP"){
+        showDialog(context: context, builder: (BuildContext bContext){
+          return AlertDialog(
+            content: Container(
+              height: 100,
+              child: Column(
+                children: [
+                  Text("La tienda se encuentra cerrada, la mayoría de acciones estarán bloqueadas hasta que la tienda se encuentre abierta de nuevo")
+                ],
+              ),
+            ),
+            actions: [
+              RaisedButton(
+                onPressed: (){
+            _userService.changeStatusStore();
+            Navigator.pop(context);
+          },
+                color: Color.fromRGBO(148, 3, 123, 1.0),
+                child: Text(
+                  'Abrir tienda',
+                  style: TextStyle(color: Colors.white),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              ),
+              RaisedButton(onPressed: (){
+                Navigator.pop(context);
+              },
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.black),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              )
+            ],
+          );});
+      }else{
+        print("open");
+      }
     });
   }
 

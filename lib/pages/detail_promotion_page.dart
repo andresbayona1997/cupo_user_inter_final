@@ -16,8 +16,9 @@ import 'package:shopkeeper/utils/widgets/dialog_progress.dart';
 import 'package:shopkeeper/utils/widgets/no_data_found.dart';
 
 class DetailPromotionPage extends StatefulWidget {
-  DetailPromotionPage({this.promotionCode});
+  DetailPromotionPage({this.promotionCode, this.statusPrm});
   final String promotionCode;
+  final bool statusPrm;
   @override
   _DetailPromotionPageState createState() => _DetailPromotionPageState();
 }
@@ -41,7 +42,8 @@ class _DetailPromotionPageState extends State<DetailPromotionPage> {
     "date_end": "",
     "init_hour": "",
     "end_hour": "",
-    "type_promotion": ""
+    "type_promotion": "",
+    "status": ""
   };
   bool _isLoading = false;
 
@@ -71,6 +73,7 @@ class _DetailPromotionPageState extends State<DetailPromotionPage> {
                 promotion["init_hour"] = data["init_hour"];
                 promotion["end_hour"] = data["end_hour"];
                 promotion["type_promotion"] = data["type_promotion"];
+                promotion["status"] = data["accepted"];
               } else {
                 _noDataFound = true;
               }
@@ -382,8 +385,10 @@ class _DetailPromotionPageState extends State<DetailPromotionPage> {
 
   Widget _acceptBtn() {
     bool available;
+    bool accepted;
     String date = promotion["date_init"];
     String hour = promotion["init_hour"];
+    bool status = promotion["status"];
     final dateF = date.split('-');
     int year = int.parse(dateF[0]);
     int month = int.parse(dateF[1]);
@@ -394,10 +399,16 @@ class _DetailPromotionPageState extends State<DetailPromotionPage> {
     DateTime time = DateTime(
       year,month,day,hou,min
     );
-    if(DateTime.now().isAfter(time)){
-      available = true;
+    if(!widget.statusPrm){
+      accepted = false;
+      if(DateTime.now().isAfter(time)){
+        available = true;
+      }else{
+        available = false;
+      }
     }else{
       available = false;
+      accepted = true;
     }
     return Padding(
       padding: EdgeInsets.all(15.0),
@@ -407,7 +418,7 @@ class _DetailPromotionPageState extends State<DetailPromotionPage> {
         child: RaisedButton(
           onPressed: available?_openConfirmDialog:(){},
           color: available?Color.fromRGBO(148, 3, 123, 1.0):Colors.grey,
-          child: Text('Aceptar Promoción', style: TextStyle(color: Colors.white),),
+          child: Text(accepted?"Promoción aceptada":'Aceptar Promoción', style: TextStyle(color: Colors.white),),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0))
           ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shopkeeper/pages/detail_promotion_page.dart';
+import 'package:shopkeeper/services/user_service.dart';
 import 'package:shopkeeper/utils/options.dart';
 import 'package:shopkeeper/utils/widgets/dialog_progress.dart';
 import 'package:shopkeeper/utils/widgets/nav_bar.dart';
@@ -34,6 +35,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   bool _isLoading = true;
   bool _nitExists = false;
 
+  UserService _userService = new UserService();
   @override
   void initState() {
     super.initState();
@@ -59,6 +61,48 @@ class _NotificationsPageState extends State<NotificationsPage> {
         }
       });
     });
+    _userService.getStatusStore().then((value){
+      if(value["data"]["status"]=="CLOSED_SHOP"){
+        showDialog(context: context, builder: (BuildContext bContext){
+          return AlertDialog(
+            content: Container(
+              height: 100,
+              child: Column(
+                children: [
+                  Text("La tienda se encuentra cerrada, la mayoría de acciones estarán bloqueadas hasta que la tienda se encuentre abierta de nuevo")
+                ],
+              ),
+            ),
+            actions: [
+              RaisedButton(
+                onPressed: (){
+                  _userService.changeStatusStore();
+                  Navigator.pop(context);
+                },
+                color: Color.fromRGBO(148, 3, 123, 1.0),
+                child: Text(
+                  'Abrir tienda',
+                  style: TextStyle(color: Colors.white),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              ),
+              RaisedButton(onPressed: (){
+                Navigator.pop(context);
+              },
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.black),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              )
+            ],
+          );});
+      }else{
+        print("open");
+      }
+    });
   }
 
   @override
@@ -71,12 +115,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _notifications.add(PromotionNotificationModel.fromSnapshot(event.snapshot));
   }
 
-  _onTapNotification(String promotionCode) {
+  _onTapNotification(String promotionCode, bool status) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DetailPromotionPage(
           promotionCode: promotionCode,
+          statusPrm: status,
         ),
       ),
     );
@@ -95,11 +140,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
   }
 
-  Color _getColor(String endDate) {
+  Color _getColor(String endDate, bool status) {
     String parsedCurrentDate = Date.formatDate(DateTime.now(), 'yyyy-MM-dd');
     String parsedEndDate = Date.parseDate(endDate, 'yyyy-MM-dd');
     int daysLeft = Date.compareDates(parsedCurrentDate, parsedEndDate);
-    Color color = (daysLeft < 0) ? Colors.grey : Colors.teal;
+    Color color = (daysLeft < 0) ? Colors.grey : Colors.teal ;
+    color = status ? Colors.grey : Colors.teal;
     return color;
   }
 
@@ -121,7 +167,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               child: InkWell(
                 splashFactory: InkRipple.splashFactory,
                 onTap: () =>
-                    _onTapNotification(snapshot.value["promotion_code"]),
+                    _onTapNotification(snapshot.value["promotion_code"], snapshot.value["status"]),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -133,7 +179,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Icon(Icons.notifications,
-                              color: _getColor(snapshot.value["date_end"])),
+                              color: _getColor(snapshot.value["date_end"], snapshot.value["status"])),
                         ),
                       ),
                     ),
